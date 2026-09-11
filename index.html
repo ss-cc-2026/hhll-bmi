@@ -99,10 +99,10 @@
     <p class="cta-headline">気になる方は診療予約!</p>
     <p id="ctaLead">診察してから決められます。<br>無理におすすめすることはありません。</p>
     <!-- https://liff.line.me/2008195608-Qmyk1qXy/reservation/cml3cwr1k0hza2d8ctb0rjn11: MD初診予約フォームURL(計測パラメータ付き)に差し替え -->
-    <a class="cta" id="ctaReserve" href="https://liff.line.me/2008195608-Qmyk1qXy/reservation/cml3cwr1k0hza2d8ctb0rjn11">医師の診察を予約する<small>スマホで完結・約1分</small></a>
-    <p id="ctaHint" style="display:none;margin:10px 0 0;font-size:14px;color:#5d6b70;text-align:center">予約ページを開いています… LINEの確認画面が出ることがあります。数秒お待ちください</p>
+    <a class="cta" id="ctaReserve" href="https://line.me/R/oaMessage/@837mhqha/?%23%E4%BA%88%E7%B4%84">医師の診察を予約する<small>LINEに戻って予約ボタンを受け取る</small></a>
+    <p id="ctaHint" style="display:none;margin:10px 0 0;font-size:14px;color:#5d6b70;text-align:center">LINEに戻ります。表示された「#予約」をそのまま送信すると、予約ボタンが届きます</p>
     <script>
-      (function(){var a=document.getElementById('ctaReserve'),h=document.getElementById('ctaHint');if(!a)return;try{var q=new URLSearchParams(location.search);var uid=q.get('uid')||q.get('user_id');if(uid&&/^[A-Za-z0-9_-]{5,64}$/.test(uid)){a.href=a.href.split('?')[0]+'?user_id='+encodeURIComponent(uid);}}catch(e){}a.addEventListener('click',function(){a.style.opacity='0.7';a.firstChild.textContent='予約ページを開いています…';h.style.display='block';});})();
+      (function(){var a=document.getElementById('ctaReserve'),h=document.getElementById('ctaHint');if(!a)return;a.addEventListener('click',function(){a.style.opacity='0.7';a.firstChild.textContent='LINEに戻っています…';h.style.display='block';});})();
     </script>
   </div>
 
@@ -113,11 +113,22 @@
     <li>効果や副作用の感じ方には個人差があります。</li>
   </ul>
 </div>
+<div id="dlg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;padding:24px">
+  <div role="alertdialog" aria-labelledby="dlgT" aria-describedby="dlgB" style="background:#fff;border-radius:16px;max-width:340px;width:100%;padding:22px 20px 16px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.2)">
+    <div id="dlgT" style="font-weight:700;font-size:15px;color:#1d6f6a;margin-bottom:8px">ハハロルオンラインクリニック</div>
+    <div id="dlgB" style="font-size:16px;line-height:1.7;color:#1f2a2e;margin-bottom:16px">身長と体重を正しく入力してください</div>
+    <button type="button" onclick="hideDlg()" style="width:100%;border:0;border-radius:10px;background:#1d6f6a;color:#fff;font-size:16px;padding:12px;font-weight:700">OK</button>
+  </div>
+</div>
+<script>
+function showDlg(){var d=document.getElementById('dlg');d.style.display='flex';var b=d.querySelector('button');b&&b.focus();}
+function hideDlg(){document.getElementById('dlg').style.display='none';var h=document.getElementById('height');if(h){h.focus();}}
+</script>
 <script>
 function calc() {
   var h = parseFloat(document.getElementById('height').value);
   var w = parseFloat(document.getElementById('weight').value);
-  if (!h || !w || h < 80 || h > 250 || w < 20 || w > 300) { alert('身長と体重を正しく入力してください'); return; }
+  if (!h || !w || h < 80 || h > 250 || w < 20 || w > 300) { showDlg(); return; }
   var bmi = w / Math.pow(h / 100, 2);
   var v = Math.round(bmi * 10) / 10;
   document.getElementById('bmiVal').textContent = v.toFixed(1);

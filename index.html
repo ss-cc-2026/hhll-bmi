@@ -102,7 +102,7 @@
     <a class="cta" id="ctaReserve" href="https://liff.line.me/2008195608-Qmyk1qXy/reservation/cml3cwr1k0hza2d8ctb0rjn11">医師の診察を予約する<small>スマホで完結・約1分</small></a>
     <p id="ctaHint" style="display:none;margin:10px 0 0;font-size:14px;color:#5d6b70;text-align:center">予約ページを開いています… LINEの確認画面が出ることがあります。数秒お待ちください</p>
     <script>
-      (function(){var a=document.getElementById('ctaReserve'),h=document.getElementById('ctaHint');if(!a)return;a.addEventListener('click',function(){a.style.opacity='0.7';a.firstChild.textContent='予約ページを開いています…';h.style.display='block';});})();
+      (function(){var a=document.getElementById('ctaReserve'),h=document.getElementById('ctaHint');if(!a)return;try{var q=new URLSearchParams(location.search);var uid=q.get('uid')||q.get('user_id');if(uid&&/^[A-Za-z0-9_-]{5,64}$/.test(uid)){a.href=a.href.split('?')[0]+'?user_id='+encodeURIComponent(uid);}}catch(e){}a.addEventListener('click',function(){a.style.opacity='0.7';a.firstChild.textContent='予約ページを開いています…';h.style.display='block';});})();
     </script>
   </div>
 

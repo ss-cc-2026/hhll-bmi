@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMIチェック | ハハロルオンラインクリニック</title>
+<!--
+  HL-2342 LINE直行ステップ配信 A-4「BMIチェック」から誘導するBMI計算ページ(AIドラフト)
+  実装: のぶもとさん(ホスティング先=LP配下を想定・ドメインは既存LPに合わせる)
+  差し替え箇所: 下部CTAの href「https://liff.line.me/2008195608-Qmyk1qXy/reservation/cml3cwr1k0hza2d8ctb0rjn11」→ MD初診予約フォーム(計測パラメータ付き)
+  法務メモ: 効能・痩身効果の断定なし/判定は日本肥満学会の区分(一般的事実情報)のみ/
+           診察必須・自由診療の注記あり。文言変更時は広告GLマトリクス(2026-09-08確定版)を参照
+-->
+<style>
+  :root {
+    --cream: #FFF6EC; --green: #1F6F6B; --green-soft: #E4F0EE;
+    --coral: #E0704A; --coral-soft: #FBE9E1; --ink: #2B2B28; --sub: #6E675E;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Hiragino Maru Gothic ProN", "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+    background: var(--cream); color: var(--ink); line-height: 1.7;
+  }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 24px 20px 48px; }
+  .band { height: 8px; background: var(--green); }
+  h1 { color: var(--green); font-size: 24px; text-align: center; margin: 20px 0 4px; }
+  .lead { text-align: center; color: var(--sub); font-size: 14px; margin-bottom: 24px; }
+  .card { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.05); margin-bottom: 16px; }
+  label { display: block; font-size: 14px; font-weight: 600; color: var(--green); margin-bottom: 6px; }
+  .field { margin-bottom: 16px; }
+  .input-row { display: flex; align-items: center; gap: 8px; }
+  input[type="number"] {
+    flex: 1; font-size: 22px; padding: 12px 14px; border: 2px solid var(--green-soft);
+    border-radius: 12px; width: 100%; -moz-appearance: textfield;
+  }
+  input:focus { outline: none; border-color: var(--green); }
+  .unit { font-size: 14px; color: var(--sub); width: 32px; }
+  .btn {
+    display: block; width: 100%; border: none; cursor: pointer; text-align: center;
+    background: var(--green); color: #fff; font-size: 18px; font-weight: 700;
+    padding: 16px; border-radius: 999px; margin-top: 8px;
+  }
+  .btn:active { opacity: .85; }
+  #result { display: none; }
+  .bmi-num { text-align: center; font-size: 15px; color: var(--sub); }
+  .bmi-num strong { display: block; font-size: 52px; color: var(--green); line-height: 1.2; }
+  .verdict {
+    text-align: center; font-size: 18px; font-weight: 700; margin: 10px 0 4px;
+    padding: 10px; border-radius: 12px; background: var(--green-soft); color: var(--green);
+  }
+  .verdict.hi { background: var(--coral-soft); color: var(--coral); }
+  .gauge { position: relative; height: 14px; border-radius: 7px; margin: 18px 4px 6px;
+    background: linear-gradient(to right, #9CC7E8 0 18%, #8FC9A9 18% 42%, #F2C94C 42% 60%, #E8A87C 60% 78%, #E0704A 78% 100%); }
+  .marker { position: absolute; top: -7px; width: 4px; height: 28px; background: var(--ink); border-radius: 2px; transform: translateX(-50%); }
+  .gauge-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--sub); padding: 0 2px; margin-bottom: 12px; }
+  .note-box { font-size: 13px; color: var(--sub); background: var(--green-soft); border-radius: 12px; padding: 12px 14px; margin-top: 10px; }
+  .cta-card { background: var(--green); color: #fff; text-align: center; border-radius: 16px; padding: 22px 20px; margin-top: 20px; }
+  .cta-headline { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .cta-card p { font-size: 14px; margin-bottom: 12px; }
+  .cta {
+    display: block; background: var(--coral); color: #fff; text-decoration: none;
+    font-size: 18px; font-weight: 700; padding: 16px; border-radius: 999px;
+  }
+  .cta small { display: block; font-weight: 400; font-size: 12px; opacity: .9; }
+  .fineprint { font-size: 11px; color: var(--sub); margin-top: 20px; }
+  .fineprint li { margin-left: 1.2em; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="band"></div>
+<div class="wrap">
+  <h1>BMIチェック</h1>
+  <p class="lead">身長と体重を入れるだけ。<br>いまの体の状態を確認してみましょう。</p>
+
+  <div class="card">
+    <div class="field">
+      <label for="height">身長</label>
+      <div class="input-row"><input type="number" id="height" inputmode="decimal" placeholder="例) 158"><span class="unit">cm</span></div>
+    </div>
+    <div class="field">
+      <label for="weight">体重</label>
+      <div class="input-row"><input type="number" id="weight" inputmode="decimal" placeholder="例) 62"><span class="unit">kg</span></div>
+    </div>
+    <button class="btn" onclick="calc()">BMIを計算する</button>
+  </div>
+
+  <div class="card" id="result">
+    <p class="bmi-num">あなたのBMI<strong id="bmiVal">--</strong></p>
+    <div class="gauge"><div class="marker" id="marker" style="left:50%"></div></div>
+    <div class="gauge-labels"><span>18.5</span><span>25</span><span>30</span><span>35</span></div>
+    <p class="verdict" id="verdict">--</p>
+    <p style="text-align:center; font-size:13px; color:var(--sub);" id="verdictSub"></p>
+    <div class="note-box">
+      BMI(体格指数)= 体重(kg)÷ 身長(m)÷ 身長(m)。判定区分は日本肥満学会の基準によるものです。結果はあくまで目安で、健康状態を診断するものではありません。
+    </div>
+  </div>
+
+  <div class="cta-card" id="ctaCard" style="display:none;">
+    <p class="cta-headline">気になる方は診療予約!</p>
+    <p id="ctaLead">診察してから決められます。<br>無理におすすめすることはありません。</p>
+    <!-- https://liff.line.me/2008195608-Qmyk1qXy/reservation/cml3cwr1k0hza2d8ctb0rjn11: MD初診予約フォームURL(計測パラメータ付き)に差し替え -->
+    <a class="cta" href="https://liff.line.me/2008195608-Qmyk1qXy/reservation/cml3cwr1k0hza2d8ctb0rjn11">医師の診察を予約する<small>スマホで完結・約1分</small></a>
+  </div>
+
+  <ul class="fineprint">
+    <li>メディカルダイエットは自由診療です。お薬の処方には医師の診察が必要です。</li>
+    <li>※初めての方向けプランは3ヶ月(計3回)の継続契約です。詳しくは料金のご案内をご覧ください。</li>
+    <li>治療の適応は、診察で医師がご体質・ご病歴を確認した上で判断します。</li>
+    <li>効果や副作用の感じ方には個人差があります。</li>
+  </ul>
+</div>
+<script>
+function calc() {
+  var h = parseFloat(document.getElementById('height').value);
+  var w = parseFloat(document.getElementById('weight').value);
+  if (!h || !w || h < 80 || h > 250 || w < 20 || w > 300) { alert('身長と体重を正しく入力してください'); return; }
+  var bmi = w / Math.pow(h / 100, 2);
+  var v = Math.round(bmi * 10) / 10;
+  document.getElementById('bmiVal').textContent = v.toFixed(1);
+  // ゲージ位置(BMI 15〜40を0〜100%にマップ)
+  var pct = Math.max(0, Math.min(100, (bmi - 15) / 25 * 100));
+  document.getElementById('marker').style.left = pct + '%';
+  var verdict = document.getElementById('verdict');
+  var sub = document.getElementById('verdictSub');
+  verdict.classList.remove('hi');
+  if (bmi < 18.5)      { verdict.textContent = '低体重';        sub.textContent = '普通体重の範囲(18.5〜25)を下回っています。'; }
+  else if (bmi < 25)   { verdict.textContent = '普通体重';      sub.textContent = '普通体重の範囲(18.5〜25)です。'; }
+  else if (bmi < 30)   { verdict.textContent = '肥満(1度)';   verdict.classList.add('hi'); sub.textContent = 'BMI25以上は「肥満」に区分されます。'; }
+  else if (bmi < 35)   { verdict.textContent = '肥満(2度)';   verdict.classList.add('hi'); sub.textContent = 'BMI25以上は「肥満」に区分されます。'; }
+  else                 { verdict.textContent = '肥満(3度以上)'; verdict.classList.add('hi'); sub.textContent = 'BMI25以上は「肥満」に区分されます。'; }
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('ctaCard').style.display = 'block';
+  document.getElementById('result').scrollIntoView({behavior: 'smooth'});
+}
+</script>
+</body>
+</html>
